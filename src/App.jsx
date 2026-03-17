@@ -11,6 +11,7 @@ import PatientDetailPage from "./pages/PatientDetailPage"
 import ProceduresPage from "./pages/ProceduresPage"
 import QuotesPage from "./pages/QuotesPage"
 import QuoteDetailPage from "./pages/QuoteDetailPage"
+import AppointmentsPage from "./pages/AppointmentsPage"
 
 //pagine che richiedono autenticazione
 //durante la verifica, spinner attivo
@@ -95,7 +96,7 @@ function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/patients/:id" element={<PatientDetailPage />} />
-            {/* <Route path="/appointments" element={<AppointmentsPage />} /> */}
+            <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/quotes" element={<QuotesPage />} />
             <Route path="/quotes/:id" element={<QuoteDetailPage />} />
             {/* <Route path="/payments" element={<PaymentsPage />} /> */}
