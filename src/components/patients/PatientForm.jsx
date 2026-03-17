@@ -2,19 +2,18 @@ import { useState, useEffect } from "react"
 import { Modal, Form, Button, Spinner, Alert, Row, Col } from "react-bootstrap"
 import api from "../../services/api"
 
+const emptyForm = {
+  firstName: "",
+  lastName: "",
+  birthDate: "",
+  fiscalCode: "",
+  email: "",
+  phone: "",
+  address: "",
+  emailConsent: false,
+}
 // se patient è null → crea, se è un oggetto → modifica
 const PatientForm = function ({ show, patient, onClose, onSaved }) {
-  const emptyForm = {
-    firstName: "",
-    lastName: "",
-    birthDate: "",
-    fiscalCode: "",
-    email: "",
-    phone: "",
-    address: "",
-    emailConsent: false,
-  }
-
   const [form, setForm] = useState(emptyForm)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")

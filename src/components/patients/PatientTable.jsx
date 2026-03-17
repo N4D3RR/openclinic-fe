@@ -117,7 +117,12 @@ const PatientTable = function ({
                     {patient.emailConsent ? "Sì" : "No"}
                   </Badge>
                 </td>
-                <td className="text-end">
+                <td
+                  className="text-end"
+                  onClick={function (e) {
+                    e.stopPropagation
+                  }}
+                >
                   <button
                     className="btn btn-sm btn-outline-secondary me-2"
                     title="Modifica"

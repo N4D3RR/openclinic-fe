@@ -2,13 +2,12 @@ import { useState, useEffect } from "react"
 import { Modal, Form, Button, Spinner, Alert, Row, Col } from "react-bootstrap"
 import api from "../../services/api"
 
+const emptyForm = {
+  procedureId: "",
+  toothNumber: "",
+  quotedPrice: "",
+}
 const QuoteItemForm = function ({ show, quoteId, onClose, onSaved }) {
-  const emptyForm = {
-    procedureId: "",
-    toothNumber: "",
-    quotedPrice: "",
-  }
-
   const [form, setForm] = useState(emptyForm)
   const [procedures, setProcedures] = useState([])
   const [loading, setLoading] = useState(false)

@@ -2,15 +2,14 @@ import { useState, useEffect } from "react"
 import { Modal, Form, Button, Spinner, Alert, Row, Col } from "react-bootstrap"
 import api from "../../services/api"
 
+const emptyForm = {
+  code: "",
+  name: "",
+  description: "",
+  durationInMinutes: "",
+  price: "",
+}
 const ProcedureForm = function ({ show, procedure, onClose, onSaved }) {
-  const emptyForm = {
-    code: "",
-    name: "",
-    description: "",
-    durationInMinutes: "",
-    price: "",
-  }
-
   const [form, setForm] = useState(emptyForm)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
