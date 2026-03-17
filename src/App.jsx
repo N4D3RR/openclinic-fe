@@ -6,6 +6,11 @@ import LoginPage from "./pages/LoginPage"
 import DashboardPage from "./pages/DashboardPage"
 import { Spinner } from "react-bootstrap"
 import "./styles/App.scss"
+import PatientsPage from "./pages/PatientsPage"
+import PatientDetailPage from "./pages/PatientDetailPage"
+import ProceduresPage from "./pages/ProceduresPage"
+import QuotesPage from "./pages/QuotesPage"
+import QuoteDetailPage from "./pages/QuoteDetailPage"
 
 //pagine che richiedono autenticazione
 //durante la verifica, spinner attivo
@@ -88,12 +93,13 @@ function App() {
             }
           >
             <Route path="/" element={<DashboardPage />} />
-            {/* <Route path="/patients" element={<PatientsPage />} /> */}
-            {/* <Route path="/patients/:id" element={<PatientDetailPage />} /> */}
+            <Route path="/patients" element={<PatientsPage />} />
+            <Route path="/patients/:id" element={<PatientDetailPage />} />
             {/* <Route path="/appointments" element={<AppointmentsPage />} /> */}
-            {/* <Route path="/quotes" element={<QuotesPage />} /> */}
+            <Route path="/quotes" element={<QuotesPage />} />
+            <Route path="/quotes/:id" element={<QuoteDetailPage />} />
             {/* <Route path="/payments" element={<PaymentsPage />} /> */}
-            {/* <Route path="/procedures" element={<ProceduresPage />} /> */}
+            <Route path="/procedures" element={<ProceduresPage />} />
             {/* <Route path="/users" element={<UsersPage />} /> */}
           </Route>
 

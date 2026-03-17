@@ -27,6 +27,7 @@ const LoginPage = function () {
     setLoading(true)
 
     // 1. POST /auth/login - ricevo accessToken (LoginResDTO)
+    //non uso api.js perchè login non ha il token da prendere per la chiamata
     fetch(API_URL + "/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

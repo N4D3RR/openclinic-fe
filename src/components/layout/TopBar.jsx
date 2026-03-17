@@ -78,7 +78,7 @@ const TopBar = function ({ title, subtitle }) {
           </InputGroup.Text>
           <Form.Control
             type="text"
-            placeholder="Cerca paziente..."
+            placeholder="Cerca per cognome..."
             className="border-start-0"
             value={searchQuery}
             onChange={handleSearch}
@@ -106,7 +106,7 @@ const TopBar = function ({ title, subtitle }) {
                     {patient.firstName} {patient.lastName}
                   </div>
                   <div className="text-muted" style={{ fontSize: 12 }}>
-                    {patient.taxCode}
+                    {patient.fiscalCode}
                   </div>
                 </div>
               )

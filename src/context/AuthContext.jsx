@@ -78,8 +78,10 @@ const AuthProvider = function ({ children }) {
           setLoading(false)
         })
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   //PROVIDER
