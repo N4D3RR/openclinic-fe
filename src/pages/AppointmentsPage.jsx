@@ -6,14 +6,17 @@ import FullCalendar from "@fullcalendar/react"
 import timeGridPlugin from "@fullcalendar/timegrid"
 import dayGridPlugin from "@fullcalendar/daygrid"
 import interactionPlugin from "@fullcalendar/interaction"
+import AppointmentForm from "../components/appointments/AppointmentForm"
 
 const AppointmentsPage = function () {
   const [appointments, setAppointments] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showModal, setShowModal] = useState(false)
   const [selectedAppointment, setSelectedAppointment] = useState(null)
   const [selectedDate, setSelectedDate] = useState(null)
+
+  const [currentRange, setCurrentRange] = useState({ from: null, to: null })
 
   //converto appuntamenti del BE nel formato richiesto da FullCalendar
   const mapToApp = function (appointmentsList) {
@@ -25,8 +28,8 @@ const AppointmentsPage = function () {
       return {
         id: a.id,
         title: a.patient.firstName + " " + a.patient.lastName,
-        start: start.toISOString,
-        end: start.toISOString,
+        start: start.toISOString(),
+        end: end.toISOString(),
         extendedProps: { appointment: a },
       }
     })
@@ -56,6 +59,7 @@ const AppointmentsPage = function () {
 
   //quando cambio settimana, rifaccio il fetch
   const handleDateSet = function (info) {
+    setCurrentRange({ from: info.start, to: info.end })
     fetchAppointments(info.start, info.end)
   }
 
@@ -106,9 +110,25 @@ const AppointmentsPage = function () {
         dateClick={handleDateClick}
         eventClick={handleEventClick}
       />
+      <AppointmentForm
+        show={showModal}
+        appointment={selectedAppointment}
+        selectedDate={selectedDate}
+        onClose={function () {
+          setShowModal(false)
+        }}
+        onSaved={function () {
+          setShowModal(false)
+          setSelectedAppointment(null)
+          setSelectedDate(null)
+          if (currentRange.from && currentRange.to) {
+            fetchAppointments(currentRange.from, currentRange.to)
+          }
+        }}
+      />
     </>
   )
 }
-//TODO: modale appointmentForm
+
 //TODO: migliorare calendario con time slot da 15 min, filtro o divisione per operatore/poltrona, drag and drop appuntamenti
 export default AppointmentsPage
