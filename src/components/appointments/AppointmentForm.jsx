@@ -18,7 +18,7 @@ const AppointmentForm = function ({
   onClose,
   onSaved,
 }) {
-  const { isAdmin } = useContext(AuthContext)
+  const { isAdmin, isSecretary, user } = useContext(AuthContext)
 
   const [form, setForm] = useState(emptyForm)
   const [patients, setPatients] = useState([])
@@ -34,14 +34,18 @@ const AppointmentForm = function ({
       setError("")
       setLoadingData(true)
 
-      // carico pazienti e dentisti in parallelo
-      Promise.all([
-        api.get("/api/patients?page=0&size=100"),
-        api.get("/api/users/role?role=DENTIST&page=0&size=100"),
-      ])
+      // carico pazienti sempre, dentisti solo se ADMIN o SECRETARY
+      const requests = [api.get("/api/patients?page=0&size=100")]
+
+      if (isAdmin() || isSecretary()) {
+        requests.push(api.get("/api/users/role?role=DENTIST&page=0&size=100"))
+      }
+      Promise.all(requests)
         .then(function (results) {
           setPatients(results[0].content)
-          setDentists(results[1].content)
+          if (results[1]) {
+            setDentists(results[1].content)
+          }
           setLoadingData(false)
         })
         .catch(function () {
@@ -112,10 +116,13 @@ const AppointmentForm = function ({
       // creazione — AppointmentCreateDTO
       const payload = {
         patientId: form.patientId,
-        userId: form.userId,
+        userId: isAdmin() || isSecretary() ? form.userId : user.id,
         dateTime: form.dateTime + ":00",
         duration: parseInt(form.duration),
         notes: form.notes || null,
+      }
+      if ((isAdmin() || isSecretary()) && form.userId) {
+        payload.userId = form.userId
       }
 
       api
@@ -203,27 +210,29 @@ const AppointmentForm = function ({
               </Form.Group>
 
               {/* Dentista — select */}
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold small text-secondary">
-                  Dentista
-                </Form.Label>
-                <Form.Select
-                  name="userId"
-                  value={form.userId}
-                  onChange={handleChange}
-                  disabled={!!appointment}
-                >
-                  <option value="">Seleziona un dentista...</option>
-                  {dentists.map(function (d) {
-                    return (
-                      <option key={d.id} value={d.id}>
-                        {d.lastName} {d.firstName}
-                      </option>
-                    )
-                  })}
-                </Form.Select>
-              </Form.Group>
-
+              {(isAdmin() || isSecretary()) && (
+                <Form.Group className="mb-3">
+                  <Form.Label className="fw-semibold small text-secondary">
+                    Dentista
+                  </Form.Label>
+                  <Form.Select
+                    name="userId"
+                    value={form.userId}
+                    onChange={handleChange}
+                    required
+                    disabled={!!appointment}
+                  >
+                    <option value="">Seleziona un dentista...</option>
+                    {dentists.map(function (d) {
+                      return (
+                        <option key={d.id} value={d.id}>
+                          {d.lastName} {d.firstName}
+                        </option>
+                      )
+                    })}
+                  </Form.Select>
+                </Form.Group>
+              )}
               {/* Data e ora + Durata */}
               <Row className="mb-3">
                 <Col md={7}>
