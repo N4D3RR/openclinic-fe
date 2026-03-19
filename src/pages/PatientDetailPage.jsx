@@ -7,6 +7,7 @@ import PatientForm from "../components/patients/PatientForm"
 
 import api from "../services/api"
 import StatusBadge from "../components/common/StatusBadge"
+import ClinicalRecordForm from "../components/clinicalRecord/ClinicalRecordForm"
 
 const PatientDetailPage = function () {
   const { id } = useParams()
@@ -22,13 +23,7 @@ const PatientDetailPage = function () {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [showEditModal, setShowEditModal] = useState(false)
-
-  useEffect(
-    function () {
-      fetchAll()
-    },
-    [id],
-  )
+  const [showClinicalModal, setShowClinicalModal] = useState(false)
 
   const fetchAll = function () {
     setLoading(true)
@@ -80,6 +75,13 @@ const PatientDetailPage = function () {
       setLoading(false)
     })
   }
+
+  useEffect(
+    function () {
+      fetchAll()
+    },
+    [id],
+  )
 
   const handlePatientSaved = function () {
     setShowEditModal(false)
@@ -226,11 +228,34 @@ const PatientDetailPage = function () {
         {/* TAB 3 — Cartella Clinica */}
         <Tab eventKey="clinical" title="Cartella Clinica">
           {!clinicalRecord ? (
-            <p className="text-muted mt-3">
-              Nessuna cartella clinica registrata
-            </p>
+            <div className="text-center py-4">
+              <p className="text-muted mt-3">
+                Nessuna cartella clinica registrata
+              </p>
+              <Button
+                className="border-0 fw-semibold"
+                style={{ backgroundColor: "#2a9d8f" }}
+                onClick={function () {
+                  setShowClinicalModal(true)
+                }}
+              >
+                Crea Cartella Clinica
+              </Button>
+            </div>
           ) : (
             <div className="mt-3">
+              <div className="d-flex justify-content-end mb-3">
+                <Button
+                  size="sm"
+                  className="border-0 fw-semibold"
+                  style={{ backgroundColor: "#2a9d8f" }}
+                  onClick={function () {
+                    setShowClinicalModal(true)
+                  }}
+                >
+                  Modifica
+                </Button>
+              </div>
               <div className="row g-3 mb-4">
                 <ClinicalField
                   label="Anamnesi"
@@ -459,11 +484,24 @@ const PatientDetailPage = function () {
         }}
         onSaved={handlePatientSaved}
       />
+      {/* Modale cartella clinica */}
+      <ClinicalRecordForm
+        show={showClinicalModal}
+        clinicalRecord={clinicalRecord}
+        patientId={id}
+        onClose={function () {
+          setShowClinicalModal(false)
+        }}
+        onSaved={function () {
+          setShowClinicalModal(false)
+          fetchAll()
+        }}
+      />
     </>
   )
 }
 
-// Componenti interni di supporto ──────────────────────────────────────────
+// Componenti interni di supporto
 
 // Campo anagrafica — label + valore su 2 colonne
 const InfoField = function ({ label, value, mono }) {
