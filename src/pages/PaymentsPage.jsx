@@ -6,8 +6,8 @@ import { Alert, Button, Card, Col, Form, Row } from "react-bootstrap"
 import { BsCashCoin } from "react-icons/bs"
 import PaymentTable from "../components/payments/PaymentTable"
 import {
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -29,17 +29,46 @@ const PaymentsPage = function () {
   const [selectedPayment, setSelectedPayment] = useState(null)
   const [statusFilter, setStatusFilter] = useState("")
 
+  // filtro date e KPI da BE
+  const [dateFrom, setDateFrom] = useState("")
+  const [dateTo, setDateTo] = useState("")
+  const [kpi, setKpi] = useState(null)
+
+  // KPI: si carica una volta sola e dopo ogni salvataggio/eliminazione
+  const fetchKpi = function () {
+    api
+      .get("/api/payments/kpi")
+      .then(function (data) {
+        setKpi(data)
+      })
+      .catch(function () {})
+  }
+
   const fetchPayments = function () {
     setLoading(true)
     setError("")
 
-    const endpoint = statusFilter
-      ? "/api/payments/status?status=" +
+    let endpoint
+    if (dateFrom && dateTo) {
+      endpoint =
+        "/api/payments/date-range?from=" +
+        dateFrom +
+        "&to=" +
+        dateTo +
+        "&page=" +
+        page +
+        "&size=10" +
+        (statusFilter ? "&status=" + statusFilter : "")
+    } else if (statusFilter) {
+      endpoint =
+        "/api/payments/status?status=" +
         statusFilter +
         "&page=" +
         page +
         "&size=10"
-      : "/api/payments?page=" + page + "&size=10"
+    } else {
+      endpoint = "/api/payments?page=" + page + "&size=10"
+    }
 
     api
       .get(endpoint)
@@ -54,11 +83,15 @@ const PaymentsPage = function () {
       })
   }
 
+  useEffect(function () {
+    fetchKpi()
+  }, [])
+
   useEffect(
     function () {
       fetchPayments()
     },
-    [page, statusFilter],
+    [page, statusFilter, dateFrom, dateTo],
   )
 
   const handleNew = function () {
@@ -80,6 +113,7 @@ const PaymentsPage = function () {
       .delete("/api/payments/" + id)
       .then(function () {
         fetchPayments()
+        fetchKpi()
       })
       .catch(function () {
         setError("Errore durante l'eliminazione")
@@ -91,52 +125,22 @@ const PaymentsPage = function () {
     setShowModal(false)
     setSelectedPayment(null)
     fetchPayments()
+    fetchKpi()
   }
 
-  // calcolo KPI dai pagamenti caricati
-  const totalPaid = payments
-    .filter(function (p) {
-      return p.status === "PAID"
-    })
-    .reduce(function (acc, p) {
-      return acc + Number(p.amount)
-    }, 0)
-
-  const totalPending = payments
-    .filter(function (p) {
-      return p.status === "PENDING" || p.status === "PARTIAL"
-    })
-    .reduce(function (acc, p) {
-      return acc + Number(p.amount)
-    }, 0)
-
-  const paidCount = payments.filter(function (p) {
-    return p.status === "PAID"
-  }).length
-  const pendingCount = payments.filter(function (p) {
-    return p.status === "PENDING" || p.status === "PARTIAL"
-  }).length
-
-  const monthlyData = payments
-    .filter(function (p) {
-      return p.status === "PAID"
-    })
-    .reduce(function (acc, p) {
-      const date = new Date(p.paymentDate)
-      const key = date.toLocaleDateString("it-IT", {
-        month: "short",
-        year: "numeric",
+  // dati grafico dal KPI BE (ordinati ASC per il grafico)
+  const chartData = kpi
+    ? [...kpi.monthlyRevenue].reverse().map(function (item) {
+        const date = new Date(item.year, item.month - 1)
+        return {
+          month: date.toLocaleDateString("it-IT", {
+            month: "short",
+            year: "numeric",
+          }),
+          total: Number(item.total),
+        }
       })
-      const existing = acc.find(function (item) {
-        return item.month === key
-      })
-      if (existing) {
-        existing.total = existing.total + Number(p.amount)
-      } else {
-        acc.push({ month: key, total: Number(p.amount) })
-      }
-      return acc
-    }, [])
+    : []
 
   return (
     <>
@@ -157,7 +161,7 @@ const PaymentsPage = function () {
                 Totale incassato
               </div>
               <div className="fw-bold fs-4" style={{ color: "#22c55e" }}>
-                € {totalPaid.toFixed(2)}
+                € {kpi ? Number(kpi.totalPaid).toFixed(2) : "—"}
               </div>
             </Card.Body>
           </Card>
@@ -167,7 +171,7 @@ const PaymentsPage = function () {
             <Card.Body className="text-center py-3">
               <div className="text-muted small fw-semibold">Da incassare</div>
               <div className="fw-bold fs-4" style={{ color: "#f59e0b" }}>
-                € {totalPending.toFixed(2)}
+                € {kpi ? Number(kpi.totalPending).toFixed(2) : "—"}
               </div>
             </Card.Body>
           </Card>
@@ -179,7 +183,7 @@ const PaymentsPage = function () {
                 Pagamenti completati
               </div>
               <div className="fw-bold fs-4" style={{ color: "#2a9d8f" }}>
-                {paidCount}
+                {kpi ? kpi.paidCount : "—"}
               </div>
             </Card.Body>
           </Card>
@@ -189,56 +193,164 @@ const PaymentsPage = function () {
             <Card.Body className="text-center py-3">
               <div className="text-muted small fw-semibold">In sospeso</div>
               <div className="fw-bold fs-4" style={{ color: "#ef4444" }}>
-                {pendingCount}
+                {kpi ? kpi.pendingCount : "—"}
               </div>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* Grafico */}
+      {/* Card comparativa mese corrente vs precedente */}
+      {kpi && Number(kpi.previousMonth) > 0 && (
+        <Card className="border-0 shadow-sm mb-4">
+          <Card.Body className="d-flex align-items-center gap-4 py-3">
+            <div>
+              <div className="text-muted small fw-semibold">Mese corrente</div>
+              <div className="fw-bold fs-5">
+                € {Number(kpi.currentMonth).toFixed(2)}
+              </div>
+            </div>
+            <div>
+              <div className="text-muted small fw-semibold">
+                Mese precedente
+              </div>
+              <div className="fw-bold fs-5">
+                € {Number(kpi.previousMonth).toFixed(2)}
+              </div>
+            </div>
+            {(function () {
+              const delta = Number(kpi.currentMonth) - Number(kpi.previousMonth)
+              const pct = Math.abs(
+                (delta / Number(kpi.previousMonth)) * 100,
+              ).toFixed(1)
+              return (
+                <div
+                  className={
+                    delta >= 0 ? "text-success fw-bold" : "text-danger fw-bold"
+                  }
+                >
+                  {delta >= 0 ? "▲" : "▼"} {pct}% vs mese precedente
+                </div>
+              )
+            })()}
+          </Card.Body>
+        </Card>
+      )}
 
-      {monthlyData.length > 0 && (
+      {chartData.length > 0 && (
         <Card className="border-0 shadow-sm mb-4">
           <Card.Body>
-            <h6 className="fw-bold mb-3">Incassi per periodo</h6>
+            <h6 className="fw-bold mb-3">Andamento incassi</h6>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient
+                    id="revenueGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#2a9d8f" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="#2a9d8f" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e5e7eb"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="month"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: "#9ca3af" }}
+                />
                 <YAxis
-                  tick={{ fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: "#9ca3af" }}
                   tickFormatter={function (v) {
-                    return "€" + v
+                    return v >= 1000
+                      ? "€" + (v / 1000).toFixed(1) + "k"
+                      : "€" + v
                   }}
                 />
                 <Tooltip
                   formatter={function (v) {
-                    return "€ " + Number(v).toFixed(2)
+                    return ["€ " + Number(v).toFixed(2), "Incassato"]
+                  }}
+                  labelStyle={{ fontWeight: 600 }}
+                  contentStyle={{
+                    borderRadius: 8,
+                    border: "none",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                   }}
                 />
-                <Bar dataKey="total" fill="#2a9d8f" radius={[6, 6, 0, 0]} />
-              </BarChart>
+                <Area
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#2a9d8f"
+                  strokeWidth={2.5}
+                  fill="url(#revenueGradient)"
+                  dot={{ fill: "#2a9d8f", strokeWidth: 0, r: 4 }}
+                  activeDot={{ r: 6, stroke: "#ffffff", strokeWidth: 2 }}
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </Card.Body>
         </Card>
       )}
 
-      {/* Filtro e bottone */}
+      {/* Filtri e bottone */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <Form.Select
-          style={{ width: 200 }}
-          value={statusFilter}
-          onChange={function (e) {
-            setPage(0)
-            setStatusFilter(e.target.value)
-          }}
-        >
-          <option value="">Tutti gli stati</option>
-          <option value="PAID">Pagati</option>
-          <option value="PENDING">In attesa</option>
-          <option value="PARTIAL">Parziali</option>
-        </Form.Select>
+        <div className="d-flex gap-2 align-items-center">
+          <Form.Control
+            type="date"
+            style={{ width: 160 }}
+            value={dateFrom}
+            onChange={function (e) {
+              setPage(0)
+              setDateFrom(e.target.value)
+            }}
+          />
+          <span className="text-muted small">→</span>
+          <Form.Control
+            type="date"
+            style={{ width: 160 }}
+            value={dateTo}
+            onChange={function (e) {
+              setPage(0)
+              setDateTo(e.target.value)
+            }}
+          />
+          {(dateFrom || dateTo) && (
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={function () {
+                setDateFrom("")
+                setDateTo("")
+                setPage(0)
+              }}
+            >
+              ✕
+            </Button>
+          )}
+          <Form.Select
+            style={{ width: 200 }}
+            value={statusFilter}
+            onChange={function (e) {
+              setPage(0)
+              setStatusFilter(e.target.value)
+            }}
+          >
+            <option value="">Tutti gli stati</option>
+            <option value="PAID">Pagati</option>
+            <option value="PENDING">In attesa</option>
+            <option value="PARTIAL">Parziali</option>
+          </Form.Select>
+        </div>
 
         <Button
           onClick={handleNew}
@@ -251,7 +363,6 @@ const PaymentsPage = function () {
       </div>
 
       {/* Tabella pagamenti */}
-
       <PaymentTable
         payments={payments}
         loading={loading}
