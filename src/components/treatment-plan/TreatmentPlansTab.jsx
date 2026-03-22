@@ -4,6 +4,7 @@ import { BsCheckCircleFill } from "react-icons/bs"
 import StatusBadge from "../common/StatusBadge"
 import TreatmentForm from "../treatments/TreatmentForm"
 import api from "../../services/api"
+import { useNavigate } from "react-router-dom"
 
 const TreatmentPlansTab = function ({ patientId }) {
   const [treatmentPlans, setTreatmentPlans] = useState([])
@@ -11,6 +12,7 @@ const TreatmentPlansTab = function ({ patientId }) {
   const [loading, setLoading] = useState(true)
   const [showTreatmentModal, setShowTreatmentModal] = useState(false)
   const [selectedPlanItem, setSelectedPlanItem] = useState(null)
+  const navigate = useNavigate()
 
   const loadData = function () {
     Promise.allSettled([
@@ -73,7 +75,7 @@ const TreatmentPlansTab = function ({ patientId }) {
                   <span className="text-muted ms-3" style={{ fontSize: 13 }}>
                     {tp.startDate
                       ? new Date(tp.startDate).toLocaleDateString("it-IT")
-                      : "—"}
+                      : "-"}
                     {" → "}
                     {tp.expectedEndDate
                       ? new Date(tp.expectedEndDate).toLocaleDateString("it-IT")
@@ -86,6 +88,16 @@ const TreatmentPlansTab = function ({ patientId }) {
                     ? Number(tp.totalAmount).toFixed(2)
                     : "0.00"}
                 </div>
+                <Button
+                  size="sm"
+                  variant="outline-secondary"
+                  style={{ fontSize: 12 }}
+                  onClick={function () {
+                    navigate("/treatment-plans/" + tp.id)
+                  }}
+                >
+                  Dettaglio →
+                </Button>
               </div>
 
               {totalItems > 0 && (
