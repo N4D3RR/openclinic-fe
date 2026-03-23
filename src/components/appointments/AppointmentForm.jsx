@@ -6,6 +6,7 @@ import api from "../../services/api"
 const emptyForm = {
   patientId: "",
   userId: "",
+  treatmentPlanId: "",
   dateTime: "",
   duration: "",
   status: "CONFIRMED",
@@ -17,6 +18,8 @@ const AppointmentForm = function ({
   selectedDate,
   onClose,
   onSaved,
+  preselectedPatientId,
+  preselectedPlanId,
 }) {
   const { isAdmin, isSecretary, user } = useContext(AuthContext)
 
@@ -26,6 +29,7 @@ const AppointmentForm = function ({
   const [loading, setLoading] = useState(false)
   const [loadingData, setLoadingData] = useState(false)
   const [error, setError] = useState("")
+  const [treatmentPlans, setTreatmentPlans] = useState([])
   // quando modale si apre, carico pazienti e dentisti
   // e precompilo il form se è una modifica
   useEffect(
@@ -73,12 +77,43 @@ const AppointmentForm = function ({
         setForm({
           ...emptyForm,
           dateTime: selectedDate.substring(0, 16),
+          patientId: preselectedPatientId || "",
+          treatmentPlanId: preselectedPlanId || "",
         })
       } else {
-        setForm(emptyForm)
+        setForm({
+          ...emptyForm,
+          patientId: preselectedPatientId || "",
+          treatmentPlanId: preselectedPlanId || "",
+        })
       }
     },
     [appointment, selectedDate, show],
+  )
+
+  // dopo il useEffect esistente
+  useEffect(
+    function () {
+      const pid = form.patientId || preselectedPatientId
+      if (!pid) {
+        setTreatmentPlans([])
+        return
+      }
+      api
+        .get("/api/treatment-plans/patient/" + pid + "?page=0&size=20")
+        .then(function (data) {
+          // mostro solo i piani IN_PROGRESS
+          setTreatmentPlans(
+            (data.content || []).filter(function (p) {
+              return p.status === "IN_PROGRESS"
+            }),
+          )
+        })
+        .catch(function () {
+          setTreatmentPlans([])
+        })
+    },
+    [form.patientId, preselectedPatientId, show],
   )
 
   const handleChange = function (e) {
@@ -120,6 +155,7 @@ const AppointmentForm = function ({
         dateTime: form.dateTime + ":00",
         duration: parseInt(form.duration),
         notes: form.notes || null,
+        treatmentPlanId: form.treatmentPlanId || null,
       }
       if ((isAdmin() || isSecretary()) && form.userId) {
         payload.userId = form.userId
@@ -233,6 +269,38 @@ const AppointmentForm = function ({
                   </Form.Select>
                 </Form.Group>
               )}
+              {/* Piano di cura — solo in creazione, se ci sono piani disponibili */}
+              {!appointment && (
+                <Form.Group className="mb-3">
+                  <Form.Label className="fw-semibold small text-secondary">
+                    Piano di cura{" "}
+                    <span className="text-muted">(opzionale)</span>
+                  </Form.Label>
+                  <Form.Select
+                    name="treatmentPlanId"
+                    value={form.treatmentPlanId}
+                    onChange={handleChange}
+                    disabled={!!preselectedPlanId}
+                  >
+                    <option value="">Nessun piano collegato</option>
+                    {treatmentPlans.map(function (p) {
+                      return (
+                        <option key={p.id} value={p.id}>
+                          Piano del{" "}
+                          {new Date(p.startDate).toLocaleDateString("it-IT")} —
+                          € {Number(p.totalAmount).toFixed(2)}
+                        </option>
+                      )
+                    })}
+                  </Form.Select>
+                  {preselectedPlanId && (
+                    <div className="text-muted mt-1" style={{ fontSize: 12 }}>
+                      Appuntamento collegato al piano di cura
+                    </div>
+                  )}
+                </Form.Group>
+              )}
+
               {/* Data e ora + Durata */}
               <Row className="mb-3">
                 <Col md={7}>

@@ -6,6 +6,7 @@ import TopBar from "../components/layout/TopBar"
 import StatusBadge from "../components/common/StatusBadge"
 import TreatmentForm from "../components/treatments/TreatmentForm"
 import api from "../services/api"
+import AppointmentForm from "../components/appointments/AppointmentForm"
 
 const TreatmentPlanDetailPage = function () {
   const { id } = useParams()
@@ -17,6 +18,7 @@ const TreatmentPlanDetailPage = function () {
   const [error, setError] = useState("")
   const [showTreatmentModal, setShowTreatmentModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false)
 
   const loadData = function () {
     Promise.allSettled([
@@ -72,7 +74,7 @@ const TreatmentPlanDetailPage = function () {
       if (!t.procedure || t.procedure.id !== quoteItem.procedure.id)
         return false
       return t.treatedToothList.some(function (tt) {
-        return tt.toothCode === quoteItem.toothNumber
+        return String(tt.toothCode) === String(quoteItem.toothNumber)
       })
     })
   }
@@ -113,7 +115,21 @@ const TreatmentPlanDetailPage = function () {
             ? "Torna a " + patient.firstName + " " + patient.lastName
             : "Indietro"}
         </Button>
-        <StatusBadge status={plan.status} />
+        <div className="d-flex align-items-center gap-2">
+          <StatusBadge status={plan.status} />
+          {plan.status === "IN_PROGRESS" && (
+            <Button
+              size="sm"
+              className="border-0 fw-semibold"
+              style={{ backgroundColor: "#2a9d8f", fontSize: 12 }}
+              onClick={function () {
+                setShowAppointmentModal(true)
+              }}
+            >
+              + Nuovo appuntamento
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Card riepilogo */}
@@ -280,6 +296,18 @@ const TreatmentPlanDetailPage = function () {
             .then(function (data) {
               setTreatments(data.content || [])
             })
+        }}
+      />
+      <AppointmentForm
+        show={showAppointmentModal}
+        preselectedPatientId={patient?.id}
+        preselectedPlanId={id}
+        onClose={function () {
+          setShowAppointmentModal(false)
+        }}
+        onSaved={function () {
+          setShowAppointmentModal(false)
+          loadData()
         }}
       />
     </>

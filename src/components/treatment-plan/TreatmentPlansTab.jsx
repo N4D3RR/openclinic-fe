@@ -5,6 +5,7 @@ import StatusBadge from "../common/StatusBadge"
 import TreatmentForm from "../treatments/TreatmentForm"
 import api from "../../services/api"
 import { useNavigate } from "react-router-dom"
+import AppointmentForm from "../appointments/AppointmentForm"
 
 const TreatmentPlansTab = function ({ patientId }) {
   const [treatmentPlans, setTreatmentPlans] = useState([])
@@ -13,6 +14,9 @@ const TreatmentPlansTab = function ({ patientId }) {
   const [showTreatmentModal, setShowTreatmentModal] = useState(false)
   const [selectedPlanItem, setSelectedPlanItem] = useState(null)
   const navigate = useNavigate()
+
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false)
+  const [selectedPlanId, setSelectedPlanId] = useState(null)
 
   const loadData = function () {
     Promise.allSettled([
@@ -39,7 +43,7 @@ const TreatmentPlansTab = function ({ patientId }) {
       if (!t.procedure || t.procedure.id !== quoteItem.procedure.id)
         return false
       return t.treatedToothList.some(function (tt) {
-        return tt.toothCode === quoteItem.toothNumber
+        return String(tt.toothCode) === String(quoteItem.toothNumber)
       })
     })
   }
@@ -98,6 +102,20 @@ const TreatmentPlansTab = function ({ patientId }) {
                 >
                   Dettaglio →
                 </Button>
+                {tp.status === "IN_PROGRESS" && (
+                  <Button
+                    size="sm"
+                    className="border-0 fw-semibold ms-2"
+                    style={{ backgroundColor: "#2a9d8f", fontSize: 12 }}
+                    onClick={function (e) {
+                      e.stopPropagation()
+                      setSelectedPlanId(tp.id)
+                      setShowAppointmentModal(true)
+                    }}
+                  >
+                    + Appuntamento
+                  </Button>
+                )}
               </div>
 
               {totalItems > 0 && (
@@ -223,6 +241,20 @@ const TreatmentPlansTab = function ({ patientId }) {
         onSaved={function () {
           setShowTreatmentModal(false)
           setSelectedPlanItem(null)
+          loadData()
+        }}
+      />
+      <AppointmentForm
+        show={showAppointmentModal}
+        preselectedPatientId={patientId}
+        preselectedPlanId={selectedPlanId}
+        onClose={function () {
+          setShowAppointmentModal(false)
+          setSelectedPlanId(null)
+        }}
+        onSaved={function () {
+          setShowAppointmentModal(false)
+          setSelectedPlanId(null)
           loadData()
         }}
       />
