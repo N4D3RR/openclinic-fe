@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Spinner, Badge, Button } from "react-bootstrap"
 import ClinicalRecordForm from "../clinicalRecord/ClinicalRecordForm"
 import api from "../../services/api"
+import DocumentsSection from "../documents/DocumentSection"
 
 const ClinicalField = function ({ label, value }) {
   return (
@@ -109,45 +110,13 @@ const ClinicalRecordTab = function ({ patientId }) {
             Documenti (
             {clinicalRecord.documents ? clinicalRecord.documents.length : 0})
           </h6>
-          {!clinicalRecord.documents ||
-          clinicalRecord.documents.length === 0 ? (
-            <p className="text-muted">Nessun documento allegato</p>
-          ) : (
-            <div className="row g-2">
-              {clinicalRecord.documents.map(function (doc) {
-                return (
-                  <div key={doc.id} className="col-md-4">
-                    <div className="border rounded p-3">
-                      <div className="fw-semibold" style={{ fontSize: 14 }}>
-                        {doc.fileName}
-                      </div>
-                      <div className="text-muted" style={{ fontSize: 12 }}>
-                        {doc.type} ·{" "}
-                        {new Date(doc.uploadedAt).toLocaleDateString("it-IT")}
-                      </div>
-                      {doc.notes && (
-                        <div
-                          className="text-muted mt-1"
-                          style={{ fontSize: 12 }}
-                        >
-                          {doc.notes}
-                        </div>
-                      )}
-                      <a
-                        href={doc.fileUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn btn-sm btn-outline-secondary mt-2"
-                        style={{ fontSize: 12 }}
-                      >
-                        Apri
-                      </a>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+
+          <hr className="my-4" />
+          <DocumentsSection
+            clinicalRecordId={clinicalRecord.id}
+            documents={clinicalRecord.documents}
+            onRefresh={loadRecord}
+          />
         </div>
       )}
 
