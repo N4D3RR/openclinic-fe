@@ -31,6 +31,17 @@ const QuotesTab = function ({ patientId }) {
     [patientId],
   )
 
+  const grandTotal = quotes.reduce(function (acc, q) {
+    return (
+      acc +
+      (q.items
+        ? q.items.reduce(function (s, i) {
+            return s + Number(i.quotedPrice)
+          }, 0)
+        : 0)
+    )
+  }, 0)
+
   if (loading)
     return (
       <div className="d-flex justify-content-center py-4">
@@ -97,6 +108,12 @@ const QuotesTab = function ({ patientId }) {
           })}
         </tbody>
       </table>
+
+      {quotes.length > 0 && (
+        <div className="text-end fw-bold mt-2" style={{ fontSize: 15 }}>
+          Totale preventivi: € {grandTotal.toFixed(2)}
+        </div>
+      )}
 
       <QuoteForm
         show={showForm}

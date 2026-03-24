@@ -6,6 +6,10 @@ import {
   Spinner,
   Pagination,
   Badge,
+  Row,
+  Col,
+  Card,
+  Form,
 } from "react-bootstrap"
 import { BsPlusLg, BsEyeFill, BsTrashFill } from "react-icons/bs"
 import { Link, useNavigate } from "react-router-dom"
@@ -16,28 +20,39 @@ import api from "../services/api"
 
 const QuotesPage = function () {
   const navigate = useNavigate()
-
   const [quotes, setQuotes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
-
+  const [kpi, setKpi] = useState(null)
   const [showModal, setShowModal] = useState(false)
 
-  useEffect(
-    function () {
-      fetchQuotes()
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [page],
-  )
+  const [statusFilter, setStatusFilter] = useState("")
+  const [patientFilter, setPatientFilter] = useState("")
+  const [patients, setPatients] = useState([])
 
   const fetchQuotes = function () {
     setLoading(true)
     setError("")
+
+    let endpoint = "/api/quotes?page=" + page + "&size=10"
+
+    if (patientFilter) {
+      endpoint =
+        "/api/quotes/patient/" + patientFilter + "?page=" + page + "&size=10"
+      if (statusFilter) endpoint += "&status=" + statusFilter
+    } else if (statusFilter) {
+      endpoint =
+        "/api/quotes/status?status=" +
+        statusFilter +
+        "&page=" +
+        page +
+        "&size=10"
+    }
+
     api
-      .get("/api/quotes?page=" + page + "&size=10")
+      .get(endpoint)
       .then(function (data) {
         setQuotes(data.content)
         setTotalPages(data.totalPages)
@@ -49,6 +64,33 @@ const QuotesPage = function () {
       })
   }
 
+  const fetchKpi = function () {
+    api
+      .get("/api/quotes/kpi")
+      .then(function (data) {
+        setKpi(data)
+      })
+      .catch(function () {})
+  }
+
+  useEffect(
+    function () {
+      fetchQuotes()
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [page, statusFilter, patientFilter],
+  )
+
+  useEffect(function () {
+    fetchKpi()
+    api
+      .get("/api/patients?page=0&size=200")
+      .then(function (data) {
+        setPatients(data.content)
+      })
+      .catch(function () {})
+  }, [])
+
   const handleDelete = function (id) {
     if (!window.confirm("Sei sicuro di voler eliminare questo preventivo?"))
       return
@@ -56,6 +98,7 @@ const QuotesPage = function () {
       .delete("/api/quotes/" + id)
       .then(function () {
         fetchQuotes()
+        fetchKpi()
       })
       .catch(function () {
         setError("Errore durante l'eliminazione")
@@ -65,7 +108,16 @@ const QuotesPage = function () {
   const handleSaved = function () {
     setShowModal(false)
     fetchQuotes()
+    fetchKpi()
   }
+
+  const handleResetFilters = function () {
+    setStatusFilter("")
+    setPatientFilter("")
+    setPage(0)
+  }
+
+  const hasFilters = statusFilter || patientFilter
 
   const renderPagination = function () {
     if (totalPages <= 1) return null
@@ -105,13 +157,111 @@ const QuotesPage = function () {
   return (
     <>
       <TopBar title="Preventivi" />
-
+      {/* KPI */}
+      {kpi && (
+        <Row className="g-3 mb-4">
+          <Col md={3}>
+            <Card className="border-0 shadow-sm">
+              <Card.Body className="text-center py-3">
+                <div className="text-muted small fw-semibold text-nowrap">
+                  Totali
+                </div>
+                <div className="fw-bold fs-4" style={{ color: "#1B2A3D" }}>
+                  {kpi.total}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="border-0 shadow-sm">
+              <Card.Body className="text-center py-3">
+                <div className="text-muted small fw-semibold text-nowrap">
+                  Accettati
+                </div>
+                <div className="fw-bold fs-4" style={{ color: "#22c55e" }}>
+                  {kpi.accepted}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="border-0 shadow-sm">
+              <Card.Body className="text-center py-3">
+                <div className="text-muted small fw-semibold text-nowrap">
+                  In attesa
+                </div>
+                <div className="fw-bold fs-4" style={{ color: "#f59e0b" }}>
+                  {kpi.sent}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="border-0 shadow-sm">
+              <Card.Body className="text-center py-3">
+                <div className="text-muted small fw-semibold text-nowrap">
+                  Rifiutati
+                </div>
+                <div className="fw-bold fs-4" style={{ color: "#ef4444" }}>
+                  {kpi.rejected}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      )}
       <div className="d-flex justify-content-between align-items-center mb-3">
         {error && (
           <Alert variant="danger" className="mb-0 py-2">
             {error}
           </Alert>
         )}
+
+        <div className="d-flex gap-2 align-items-center flex-wrap">
+          <Form.Select
+            style={{ width: 180 }}
+            value={statusFilter}
+            onChange={function (e) {
+              setPage(0)
+              setStatusFilter(e.target.value)
+            }}
+          >
+            <option value="">Tutti gli stati</option>
+            <option value="DRAFT">Bozza</option>
+            <option value="SENT">Inviato</option>
+            <option value="ACCEPTED">Accettato</option>
+            <option value="REJECTED">Rifiutato</option>
+          </Form.Select>
+
+          <Form.Select
+            style={{ width: 220 }}
+            value={patientFilter}
+            onChange={function (e) {
+              setPage(0)
+              setPatientFilter(e.target.value)
+            }}
+          >
+            <option value="">Tutti i pazienti</option>
+            {patients.map(function (p) {
+              return (
+                <option key={p.id} value={p.id}>
+                  {p.lastName} {p.firstName}
+                </option>
+              )
+            })}
+          </Form.Select>
+
+          {hasFilters && (
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={handleResetFilters}
+            >
+              ✕ Reset
+            </Button>
+          )}
+        </div>
+
         <div className="ms-auto">
           <Button
             onClick={function () {
