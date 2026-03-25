@@ -234,6 +234,7 @@ const AppointmentForm = function ({
                     name="patientId"
                     value={form.patientId}
                     onChange={handleChange}
+                    disabled={!!preselectedPatientId}
                     required
                   >
                     <option value="">Seleziona un paziente...</option>

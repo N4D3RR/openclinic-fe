@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { BsPlusLg } from "react-icons/bs"
 import QuoteForm from "./QuoteForm"
 
-const QuotesTab = function ({ patientId }) {
+const QuotesTab = function ({ patientId, refreshKey }) {
   const [quotes, setQuotes] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -28,7 +28,7 @@ const QuotesTab = function ({ patientId }) {
     function () {
       fetchQuotes()
     },
-    [patientId],
+    [patientId, refreshKey],
   )
 
   const grandTotal = quotes.reduce(function (acc, q) {

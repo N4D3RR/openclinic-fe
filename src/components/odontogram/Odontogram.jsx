@@ -6,32 +6,74 @@ import api from "../../services/api"
 import TreatmentForm from "../treatments/TreatmentForm"
 import OdontogramQuoteModal from "./OdontogramQuoteModal"
 
+//TODO: aggiungere a Procedure un enum type per classificare le procedure e assegnare un colore.
+//feature futura, class proceduretype per permettere all'utente di creare nuova categoria con colore
+
 const PROCEDURE_COLORS = [
   {
-    label: "Estrazione",
-    color: "var(--bs-danger)",
-    keys: ["estrazione", "extraction"],
-  },
-  { label: "Impianto", color: "#3b82f6", keys: ["impianto", "implant"] },
-  {
-    label: "Endodonzia",
-    color: "var(--bs-warning)",
-    keys: ["endodonzia", "devitalizzazione", "root canal", "end"],
-  },
-  {
-    label: "Corona/Protesi",
-    color: "#8b5cf6",
-    keys: ["corona", "protesi", "crown"],
-  },
-  {
-    label: "Otturazione",
-    color: "var(--bs-primary)",
-    keys: ["otturazione", "filling", "composita", "est"],
+    label: "Visita",
+    color: "#64748b",
+    keys: ["vis001", "visita", "controllo", "routine"],
   },
   {
     label: "Igiene",
     color: "var(--bs-success)",
-    keys: ["igiene", "scaling", "pulizia"],
+    keys: ["det001", "detartrasi", "igiene", "scaling", "pulizia", "tartaro"],
+  },
+  {
+    label: "Otturazione",
+    color: "var(--bs-primary)",
+    keys: [
+      "otu001",
+      "otu002",
+      "otturazione",
+      "filling",
+      "composita",
+      "restauro",
+    ],
+  },
+  {
+    label: "Endodonzia",
+    color: "var(--bs-warning)",
+    keys: ["end001", "end002", "endodonzia", "devitalizzazione", "root canal"],
+  },
+  {
+    label: "Corona/Protesi",
+    color: "#8b5cf6",
+    keys: ["cor001", "pr0001", "corona", "protesi", "ceramica", "porcellana"],
+  },
+  {
+    label: "Impianto",
+    color: "#3b82f6",
+    keys: ["imp001", "impianto", "implant", "fixture", "osteointegrato"],
+  },
+  {
+    label: "Estrazione",
+    color: "var(--bs-danger)",
+    keys: ["est001", "est002", "estrazione", "extraction", "osteotomia"],
+  },
+  {
+    label: "Sbiancamento",
+    color: "#f0abfc",
+    keys: ["bia001", "sbiancamento", "whitening", "led"],
+  },
+  {
+    label: "Chirurgia",
+    color: "#f97316",
+    keys: ["aen001", "gengivectomia", "gengiva", "chirurgia"],
+  },
+  {
+    label: "Radiologia",
+    color: "#94a3b8",
+    keys: [
+      "rxp001",
+      "rxe001",
+      "radiografia",
+      "ortopantomografia",
+      "panoramica",
+      "endorale",
+      "rx",
+    ],
   },
 ]
 
@@ -239,7 +281,7 @@ const ToothPanel = function ({
   )
 }
 
-const Odontogram = function ({ patientId }) {
+const Odontogram = function ({ patientId, onQuoteSaved }) {
   const [treatments, setTreatments] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedTooth, setSelectedTooth] = useState(null)
@@ -599,6 +641,7 @@ const Odontogram = function ({ patientId }) {
         onSaved={function () {
           setShowQuoteModal(false)
           setQuoteCart([])
+          if (onQuoteSaved) onQuoteSaved()
         }}
       />
       {quoteCart.length > 0 && (

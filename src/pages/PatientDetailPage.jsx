@@ -32,6 +32,8 @@ const PatientDetailPage = function () {
   const [error, setError] = useState("")
   const [showEditModal, setShowEditModal] = useState(false)
 
+  const [quotesRefreshKey, setQuotesRefreshKey] = useState(0)
+
   const loadPatient = function () {
     setLoading(true)
     api
@@ -94,7 +96,14 @@ const PatientDetailPage = function () {
       <Tabs defaultActiveKey="odontogram" className="mb-4">
         <Tab eventKey="odontogram" title="Odontogramma">
           <div className="mt-3">
-            <Odontogram patientId={id} />
+            <Odontogram
+              patientId={id}
+              onQuoteSaved={function () {
+                setQuotesRefreshKey(function (k) {
+                  return k + 1
+                })
+              }}
+            />
           </div>
         </Tab>
 
@@ -152,7 +161,7 @@ const PatientDetailPage = function () {
         </Tab>
 
         <Tab eventKey="quotes" title="Preventivi">
-          <QuotesTab patientId={id} />
+          <QuotesTab patientId={id} refreshKey={quotesRefreshKey} />
         </Tab>
 
         <Tab eventKey="payments" title="Pagamenti">
