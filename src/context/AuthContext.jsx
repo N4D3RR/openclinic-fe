@@ -86,7 +86,7 @@ const AuthProvider = function ({ children }) {
 
   //PROVIDER
 
-  //Il Provider rende disponibili questi valori
+  //il Provider rende disponibili questi valori
   //a qualsiasi componente figlio che faccia useContext(AuthContext)
   return (
     <AuthContext.Provider

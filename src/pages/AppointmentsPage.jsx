@@ -18,6 +18,8 @@ const statusColors = {
   NO_SHOW: { bg: "#f59e0b", border: "#d97706" },
 }
 
+//bug timezone di FullCalendar
+//toISOString converte in UTC, sottragg TimezoneOffset locale per avere orario corretto
 const toLocalISO = function (date) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()

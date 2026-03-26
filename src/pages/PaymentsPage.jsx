@@ -128,7 +128,7 @@ const PaymentsPage = function () {
     fetchKpi()
   }
 
-  // dati grafico dal KPI BE (ordinati ASC per il grafico)
+  // dati grafico dal KPI BE (ordinati ASC per il grafico, BE ordina in modo DESC. faccio reverse per avere il grafico corretto)
   const chartData = kpi
     ? [...kpi.monthlyRevenue].reverse().map(function (item) {
         const date = new Date(item.year, item.month - 1)

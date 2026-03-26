@@ -69,7 +69,9 @@ const OdontogramQuoteModal = function ({
     api
       .post("/api/quotes", quotePayload)
       .then(function (quote) {
-        //2 aggiungo tutte le voci in sequenza
+        //2 aggiungo tutte le voci in sequenza con reduce
+        //ad ogni iterazione chain è la promise dell'operazione precedente, .then essegue il post successivo solo al completamento del precedente
+        //faccio un post sequenziale con reduce su promise chain, con promise.all sarebbero stati in parallelo, rischio di creare inconsistenza nel db in caso di fallimento di uno dei post
         return items.reduce(function (chain, item) {
           return chain.then(function () {
             return api.post("/api/quote-items", {

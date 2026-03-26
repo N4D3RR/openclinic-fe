@@ -641,6 +641,7 @@ const Odontogram = function ({ patientId, onQuoteSaved }) {
         onSaved={function () {
           setShowQuoteModal(false)
           setQuoteCart([])
+          //onquotesaved non è required
           if (onQuoteSaved) onQuoteSaved()
         }}
       />
