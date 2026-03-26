@@ -70,17 +70,17 @@ const DocumentsSection = function ({ clinicalRecordId, documents, onRefresh }) {
                   style={{ fontSize: 13 }}
                 >
                   <div className="d-flex align-items-start justify-content-between gap-2">
-                    <div className="d-flex align-items-center gap-2 min-w-0">
+                    <div className="d-flex align-items-center gap-2 min-w-0 flex-grow-1 overflow-hidden">
                       {getFileIcon(doc.fileName)}
                       <span
-                        className="fw-semibold text-truncate"
+                        className="fw-semibold text-truncate d-block"
                         style={{ fontSize: 13 }}
                         title={doc.fileName}
                       >
                         {doc.fileName}
                       </span>
                     </div>
-                    <button
+                    <Button
                       className="btn btn-link p-0 text-danger flex-shrink-0"
                       style={{ fontSize: 13 }}
                       onClick={function () {
@@ -90,7 +90,7 @@ const DocumentsSection = function ({ clinicalRecordId, documents, onRefresh }) {
                       title="Elimina"
                     >
                       <BsTrash size={14} />
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="d-flex align-items-center gap-2 mt-2">

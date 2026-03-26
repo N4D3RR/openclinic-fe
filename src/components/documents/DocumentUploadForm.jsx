@@ -49,6 +49,8 @@ const DocumentUploadForm = function ({
       })
       .catch(function (err) {
         setError(err?.message || "Errore durante il caricamento")
+      })
+      .finally(function () {
         setLoading(false)
       })
   }
