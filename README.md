@@ -2,7 +2,7 @@
 
 React SPA for OpenClinic, a dental practice management system built as an EPICODE bootcamp capstone project.
 
-> The backend repository is available at [Capstone-Backend](https://github.com/N4D3RR/openclinic-be)
+> The backend repository is available at [OpenClinic-Backend](https://github.com/N4D3RR/openclinic-be)
 
 ---
 
