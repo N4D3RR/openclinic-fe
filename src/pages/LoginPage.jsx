@@ -65,89 +65,92 @@ const LoginPage = function () {
   }
 
   return (
-    <div className="login-wrapper d-flex align-items-center justify-content-center">
-      <Card
-        className="p-4 shadow border-0"
-        style={{ maxWidth: 400, width: "100%", borderRadius: 16 }}
-      >
-        {/* Logo */}
-        <div className="text-center mb-4">
-          <div
-            className="d-inline-flex align-items-center justify-content-center rounded-4 mb-3"
-            style={{
-              width: 56,
-              height: 56,
-              backgroundColor: "rgba(42, 157, 143, 0.1)",
-              color: "var(--bs-primary)",
-            }}
-          >
-            <BsClipboard2PulseFill size={28} />
+    <>
+      <title>Login — OpenClinic</title>
+      <div className="login-wrapper d-flex align-items-center justify-content-center">
+        <Card
+          className="p-4 shadow border-0"
+          style={{ maxWidth: 400, width: "100%", borderRadius: 16 }}
+        >
+          {/* Logo */}
+          <div className="text-center mb-4">
+            <div
+              className="d-inline-flex align-items-center justify-content-center rounded-4 mb-3"
+              style={{
+                width: 56,
+                height: 56,
+                backgroundColor: "rgba(42, 157, 143, 0.1)",
+                color: "var(--bs-primary)",
+              }}
+            >
+              <BsClipboard2PulseFill size={28} />
+            </div>
+            <h1
+              className="fw-bold mb-0"
+              style={{ fontSize: 24, letterSpacing: -0.5 }}
+            >
+              OpenClinic
+            </h1>
+            <p className="text-secondary mt-1" style={{ fontSize: 14 }}>
+              Gestionale Odontoiatrico
+            </p>
           </div>
-          <h1
-            className="fw-bold mb-0"
-            style={{ fontSize: 24, letterSpacing: -0.5 }}
-          >
-            OpenClinic
-          </h1>
-          <p className="text-secondary mt-1" style={{ fontSize: 14 }}>
-            Gestionale Odontoiatrico
-          </p>
-        </div>
 
-        {/* Error */}
-        {error && (
-          <Alert variant="danger" className="text-center">
-            {error}
-          </Alert>
-        )}
+          {/* Error */}
+          {error && (
+            <Alert variant="danger" className="text-center">
+              {error}
+            </Alert>
+          )}
 
-        {/* Form login*/}
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold small text-secondary">
-              Email
-            </Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="email@openclinic.it"
-              value={email}
-              onChange={function (e) {
-                setEmail(e.target.value)
+          {/* Form login*/}
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-semibold small text-secondary">
+                Email
+              </Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="email@openclinic.it"
+                value={email}
+                onChange={function (e) {
+                  setEmail(e.target.value)
+                }}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label className="fw-semibold small text-secondary">
+                Password
+              </Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={function (e) {
+                  setPassword(e.target.value)
+                }}
+                required
+              />
+            </Form.Group>
+
+            <Button
+              type="submit"
+              className="w-100 fw-bold border-0"
+              style={{
+                backgroundColor: "var(--bs-primary)",
+                padding: "11px",
+                fontSize: 15,
               }}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-4">
-            <Form.Label className="fw-semibold small text-secondary">
-              Password
-            </Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={function (e) {
-                setPassword(e.target.value)
-              }}
-              required
-            />
-          </Form.Group>
-
-          <Button
-            type="submit"
-            className="w-100 fw-bold border-0"
-            style={{
-              backgroundColor: "var(--bs-primary)",
-              padding: "11px",
-              fontSize: 15,
-            }}
-            disabled={loading}
-          >
-            {loading ? <Spinner animation="border" size="sm" /> : "Accedi"}
-          </Button>
-        </Form>
-      </Card>
-    </div>
+              disabled={loading}
+            >
+              {loading ? <Spinner animation="border" size="sm" /> : "Accedi"}
+            </Button>
+          </Form>
+        </Card>
+      </div>
+    </>
   )
 }
 

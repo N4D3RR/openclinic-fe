@@ -118,6 +118,7 @@ const QuoteDetailPage = function () {
 
   return (
     <>
+      <title>Dettaglio Preventivo — OpenClinic</title>
       <TopBar
         title={
           "Preventivo — " +

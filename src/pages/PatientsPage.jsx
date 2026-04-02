@@ -79,6 +79,7 @@ const PatientsPage = function () {
 
   return (
     <>
+      <title>Pazienti — OpenClinic</title>
       <TopBar title="Pazienti" />
 
       <div className="d-flex justify-content-between align-items-center mb-3">

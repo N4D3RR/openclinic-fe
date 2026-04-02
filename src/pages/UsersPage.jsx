@@ -105,6 +105,7 @@ const UsersPage = function () {
   }
   return (
     <>
+      <title>Utenti — OpenClinic</title>
       <TopBar title="Utenti" />
 
       <div className="d-flex justify-content-between align-items-center mb-3">

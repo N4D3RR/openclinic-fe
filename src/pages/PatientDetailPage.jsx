@@ -67,6 +67,7 @@ const PatientDetailPage = function () {
 
   return (
     <>
+      <title>Dettaglio Paziente — OpenClinic</title>
       <TopBar
         title={patient.firstName + " " + patient.lastName}
         subtitle={"CF: " + patient.fiscalCode}

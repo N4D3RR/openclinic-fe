@@ -96,6 +96,7 @@ const TreatmentPlanDetailPage = function () {
 
   return (
     <>
+      <title>Piano di Cura — OpenClinic</title>
       <TopBar
         title={"Piano di Cura"}
         subtitle={patient ? patient.firstName + " " + patient.lastName : ""}

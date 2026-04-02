@@ -81,6 +81,7 @@ const DashboardPage = function () {
 
   return (
     <>
+      <title>Dashboard — OpenClinic</title>
       <TopBar title="Dashboard" subtitle={today} />
 
       {error && <Alert variant="danger">{error}</Alert>}
