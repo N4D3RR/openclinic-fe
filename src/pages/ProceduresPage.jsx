@@ -107,6 +107,7 @@ const ProceduresPage = function () {
 
   return (
     <>
+      <title>Prestazioni — OpenClinic</title>
       <TopBar title="Prestazioni" />
 
       <div className="d-flex justify-content-between align-items-center mb-3">

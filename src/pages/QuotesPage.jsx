@@ -155,6 +155,7 @@ const QuotesPage = function () {
 
   return (
     <>
+      <title>Preventivi — OpenClinic</title>
       <TopBar title="Preventivi" />
       {/* KPI */}
       {kpi && (

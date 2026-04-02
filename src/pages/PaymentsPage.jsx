@@ -144,6 +144,7 @@ const PaymentsPage = function () {
 
   return (
     <>
+      <title>Pagamenti & Report — OpenClinic</title>
       <TopBar title="Pagamenti & Report" />
 
       {error && (

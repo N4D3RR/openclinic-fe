@@ -168,6 +168,7 @@ const AppointmentsPage = function () {
 
   return (
     <>
+      <title>Agenda — OpenClinic</title>
       <TopBar title="Agenda" />
 
       {error && (
