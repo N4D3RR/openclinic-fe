@@ -14,6 +14,23 @@ React SPA for OpenClinic, a dental practice management system built as an EPICOD
 
 ---
 
+## Live Demo
+
+**[openclinic-fe.vercel.app](https://openclinic-fe.vercel.app)**
+
+### Demo Credentials
+
+| Role      | Email                        | Password   |
+| --------- | ---------------------------- | ---------- |
+| Admin     | admin@openclinic.it          | Admin1234  |
+| Dentist   | marco.bianchi@openclinic.it  | Password1! |
+| Hygienist | sara.conti@openclinic.it     | Password1! |
+| Secretary | giulia.moretti@openclinic.it | Password1! |
+
+> Each role has different permissions — try logging in with different accounts to see how the interface adapts. The database is pre-seeded with realistic demo data.
+
+---
+
 ## Tech Stack
 
 |            |                                                 |
